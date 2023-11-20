@@ -1,5 +1,5 @@
 import torch
-from circle.circle_detection_data import generate_examples
+from circle.circle_detection_data import generate_examples, iou
 from torch.utils.data import Dataset
 import numpy as np
 from torch import tensor
