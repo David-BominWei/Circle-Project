@@ -15,72 +15,49 @@
 
 ## Model Design
 
-```flow
++ the model architecture is show here
+
+```mermaid
 graph TD
-    subgraph InputLayer[Input (1 channel)]
-    end
-    
-    subgraph Conv1[Conv2d(64, 7x7)]
-        -->|BatchNorm2d| BatchNorm2d
-        -->|ReLU| ReLU
-    end
-    
-    subgraph MaxPool[MaxPool2d(3x3, 2)]
-    end
-    
-    subgraph ResNetBlock0[ResNetBlock(64)]
-        -->|Conv2d| Conv2d
-        -->|BatchNorm2d| BatchNorm2d
-        -->|ReLU| ReLU
-        -->|Conv2d| Conv2d
-        -->|BatchNorm2d| BatchNorm2d
-        -->|Add Residual Connection| Add
-        -->|ReLU| ReLU
-    end
-    
-    subgraph ResNetBlock1[ResNetBlock(64)]
-        -->|Conv2d| Conv2d
-        -->|BatchNorm2d| BatchNorm2d
-        -->|ReLU| ReLU
-        -->|Conv2d| Conv2d
-        -->|BatchNorm2d| BatchNorm2d
-        -->|Add Residual Connection| Add
-        -->|ReLU| ReLU
-    end
-    
-    subgraph ResNetBlockN[...more blocks...]
-    end
-    
-    subgraph ResNetBlockLast[ResNetBlock(512)]
-        -->|Conv2d| Conv2d
-        -->|BatchNorm2d| BatchNorm2d
-        -->|ReLU| ReLU
-        -->|Conv2d| Conv2d
-        -->|BatchNorm2d| BatchNorm2d
-        -->|Add Residual Connection| Add
-        -->|ReLU| ReLU
-    end
-    
-    subgraph AvgPool[AvgPool2d(7x7)]
-    end
-    
-    subgraph View[View]
-    end
-    
-    subgraph Linear[Linear(num_classes)]
-    end
-    
-    subgraph Output[Output(num_classes)]
-    end
-    
-    InputLayer --> Conv1
-    Conv1 --> MaxPool
-    MaxPool --> ResNetBlock0
-    ResNetBlock0 --> ResNetBlock1
-    ResNetBlock1 --> ResNetBlockN
-    ResNetBlockN --> ResNetBlockLast
-    ResNetBlockLast --> AvgPool
-    AvgPool --> View
-    View --> Linear
-    Linear --> Output
+  inputLayer["Input (1 channel)"]
+  
+  conv1["Conv2d(64, 7x7)"]
+  bn1["BatchNorm2d"]
+  relu1["ReLU"]
+  
+  maxPool["MaxPool2d(3x3, 2)"]
+  
+  resBlock0["ResNetBlock(64)"]
+  resBlock1["ResNetBlock(128)"]
+  resBlock2["ResNetBlock(256)"]
+  resBlock3["ResNetBlock(512)"]
+  
+  avgPool["AvgPool2d(7x7)"]
+  
+  linear["Linear(num_classes)"]
+  
+  output["Output(num_classes)"]
+  
+  inputLayer --> conv1 --> bn1 --> relu1 --> maxPool --> resBlock0
+  resBlock0 --> resBlock1
+  resBlock1 --> resBlock2
+  resBlock2 --> resBlock3
+  resBlock3 --> avgPool --> linear --> output
+
+  maxPool --> resBlock1
+  resBlock0 --> resBlock2
+  resBlock1 --> resBlock3
+  resBlock2 --> avgPool
+
 ```
++ some hyperparameter
+
+|parameter|value|
+|--|--|
+|optimizer|Adam|
+|scheduler|StepLR(LR dacay by 0.5 every 10 epoch)|
+|loss function|MSE Loss|
+|batch size|64|
+|learning rate|0.01|
+|epoch|100|
+|model init|constant 0|
